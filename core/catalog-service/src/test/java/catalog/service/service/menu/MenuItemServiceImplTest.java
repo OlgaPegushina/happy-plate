@@ -83,7 +83,7 @@ class MenuItemServiceImplTest {
         Restaurant restaurant = mock(Restaurant.class);
 
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(restaurant));
-        when(categoryRepository.findByIdAndRestaurant_Id(categoryId, restaurantId)).thenReturn(Optional.empty());
+        when(categoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.create(restaurantId, req))
                 .isInstanceOf(NotFoundException.class)
@@ -118,7 +118,7 @@ class MenuItemServiceImplTest {
 
         assertThat(actual).isSameAs(expected);
 
-        verify(categoryRepository, never()).findByIdAndRestaurant_Id(any(UUID.class), any(UUID.class));
+        verify(categoryRepository, never()).findByIdAndRestaurantId(any(UUID.class), any(UUID.class));
         verify(menuItemRepository).saveAndFlush(any(MenuItem.class));
         verify(menuItemMapper).toMenuItemDto(saved);
     }
@@ -141,7 +141,7 @@ class MenuItemServiceImplTest {
         MenuItem saved = mock(MenuItem.class);
 
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(restaurant));
-        when(categoryRepository.findByIdAndRestaurant_Id(categoryId, restaurantId)).thenReturn(Optional.of(category));
+        when(categoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)).thenReturn(Optional.of(category));
         when(menuItemRepository.saveAndFlush(any(MenuItem.class))).thenReturn(saved);
 
         MenuItemDto expected = mock(MenuItemDto.class);
@@ -151,7 +151,7 @@ class MenuItemServiceImplTest {
 
         assertThat(actual).isSameAs(expected);
 
-        verify(categoryRepository).findByIdAndRestaurant_Id(categoryId, restaurantId);
+        verify(categoryRepository).findByIdAndRestaurantId(categoryId, restaurantId);
         verify(menuItemRepository).saveAndFlush(any(MenuItem.class));
         verify(menuItemMapper).toMenuItemDto(saved);
     }
@@ -161,11 +161,11 @@ class MenuItemServiceImplTest {
         UUID restaurantId = UUID.randomUUID();
         UUID id = UUID.randomUUID();
 
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.empty());
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.get(restaurantId, id))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Menu item not found: " + id);
+                .hasMessageContaining("Menu item with ID " + id + " not found for restaurant: " + restaurantId);
 
         verifyNoInteractions(menuItemMapper);
     }
@@ -176,7 +176,7 @@ class MenuItemServiceImplTest {
         UUID id = UUID.randomUUID();
 
         MenuItem item = mock(MenuItem.class);
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.of(item));
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(item));
 
         MenuItemDto expected = mock(MenuItemDto.class);
         when(menuItemMapper.toMenuItemDto(item)).thenReturn(expected);
@@ -207,7 +207,7 @@ class MenuItemServiceImplTest {
         UUID categoryId = UUID.randomUUID();
 
         when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
-        when(categoryRepository.findByIdAndRestaurant_Id(categoryId, restaurantId)).thenReturn(Optional.empty());
+        when(categoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getAll(restaurantId, null, categoryId))
                 .isInstanceOf(NotFoundException.class)
@@ -242,7 +242,7 @@ class MenuItemServiceImplTest {
         verify(menuItemRepository).findForRestaurant(restaurantId, available, null);
         verify(menuItemMapper).toMenuItemDto(i1);
         verify(menuItemMapper).toMenuItemDto(i2);
-        verify(categoryRepository, never()).findByIdAndRestaurant_Id(any(UUID.class), any(UUID.class));
+        verify(categoryRepository, never()).findByIdAndRestaurantId(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -254,7 +254,7 @@ class MenuItemServiceImplTest {
         when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
 
         MenuCategory category = mock(MenuCategory.class);
-        when(categoryRepository.findByIdAndRestaurant_Id(categoryId, restaurantId)).thenReturn(Optional.of(category));
+        when(categoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)).thenReturn(Optional.of(category));
 
         MenuItem i1 = mock(MenuItem.class);
         when(menuItemRepository.findForRestaurant(restaurantId, available, categoryId))
@@ -284,11 +284,11 @@ class MenuItemServiceImplTest {
                 10
         );
 
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.empty());
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(restaurantId, id, req))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Menu item not found: " + id);
+                .hasMessageContaining("Menu item with ID " + id + " not found for restaurant: " + restaurantId);
 
         verify(menuItemRepository, never()).flush();
         verifyNoInteractions(categoryRepository, menuItemMapper);
@@ -300,7 +300,7 @@ class MenuItemServiceImplTest {
         UUID id = UUID.randomUUID();
 
         MenuItem item = mock(MenuItem.class);
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.of(item));
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(item));
 
         MenuItemUpdateDto req = new MenuItemUpdateDto(
                 null,
@@ -337,7 +337,7 @@ class MenuItemServiceImplTest {
         UUID newCategoryId = UUID.randomUUID();
 
         MenuItem item = mock(MenuItem.class);
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.of(item));
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(item));
 
         MenuItemUpdateDto req = new MenuItemUpdateDto(
                 null,
@@ -347,11 +347,11 @@ class MenuItemServiceImplTest {
                 null
         );
 
-        when(categoryRepository.findByIdAndRestaurant_Id(newCategoryId, restaurantId)).thenReturn(Optional.empty());
+        when(categoryRepository.findByIdAndRestaurantId(newCategoryId, restaurantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(restaurantId, id, req))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Category not found for restaurant: " + newCategoryId);
+                .hasMessageContaining("Category with ID " + newCategoryId + " not found for restaurant: " + restaurantId);
 
         verify(menuItemRepository, never()).flush();
         verifyNoInteractions(menuItemMapper);
@@ -364,10 +364,10 @@ class MenuItemServiceImplTest {
         UUID newCategoryId = UUID.randomUUID();
 
         MenuItem item = mock(MenuItem.class);
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.of(item));
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(item));
 
         MenuCategory category = mock(MenuCategory.class);
-        when(categoryRepository.findByIdAndRestaurant_Id(newCategoryId, restaurantId)).thenReturn(Optional.of(category));
+        when(categoryRepository.findByIdAndRestaurantId(newCategoryId, restaurantId)).thenReturn(Optional.of(category));
 
         MenuItemUpdateDto req = new MenuItemUpdateDto(
                 "New name",
@@ -399,11 +399,11 @@ class MenuItemServiceImplTest {
         UUID restaurantId = UUID.randomUUID();
         UUID id = UUID.randomUUID();
 
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.empty());
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.updateAvailableStatus(restaurantId, id, true))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Menu item not found: " + id);
+                .hasMessageContaining("Menu item with ID " + id + " not found for restaurant: " + restaurantId);
 
         verify(menuItemRepository, never()).flush();
         verifyNoInteractions(menuItemMapper);
@@ -415,7 +415,7 @@ class MenuItemServiceImplTest {
         UUID id = UUID.randomUUID();
 
         MenuItem item = mock(MenuItem.class);
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.of(item));
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(item));
 
         MenuItemDto expected = mock(MenuItemDto.class);
         when(menuItemMapper.toMenuItemDto(item)).thenReturn(expected);
@@ -434,11 +434,11 @@ class MenuItemServiceImplTest {
         UUID restaurantId = UUID.randomUUID();
         UUID id = UUID.randomUUID();
 
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.empty());
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.clearCategory(restaurantId, id))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Menu item not found: " + id);
+                .hasMessageContaining("Menu item with ID " + id + " not found for restaurant: " + restaurantId);
 
         verify(menuItemRepository, never()).flush();
         verifyNoInteractions(menuItemMapper);
@@ -450,7 +450,7 @@ class MenuItemServiceImplTest {
         UUID id = UUID.randomUUID();
 
         MenuItem item = mock(MenuItem.class);
-        when(menuItemRepository.findByIdAndRestaurant_Id(id, restaurantId)).thenReturn(Optional.of(item));
+        when(menuItemRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(item));
 
         MenuItemDto expected = mock(MenuItemDto.class);
         when(menuItemMapper.toMenuItemDto(item)).thenReturn(expected);

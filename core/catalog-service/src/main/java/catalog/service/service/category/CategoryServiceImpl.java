@@ -30,10 +30,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public CategoryDto create(UUID restaurantId, CategoryCreateDto req) {
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new NotFoundException("Restaurant not found: " + restaurantId));
+        Restaurant restaurant = getRestaurant(restaurantId);
 
-        if (categoryRepository.existsByRestaurant_IdAndNameIgnoreCase(restaurantId, req.name())) {
+        if (categoryRepository.existsByRestaurantIdAndNameIgnoreCase(restaurantId, req.name())) {
             throw new ConflictException("Category name already exists for restaurant: " + req.name());
         }
 
@@ -45,10 +44,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public List<CategoryDto> getAll(UUID restaurantId) {
-        restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new NotFoundException("Restaurant not found: " + restaurantId));
+        getRestaurant(restaurantId);
 
-        return categoryRepository.findAllByRestaurant_Id(
+        return categoryRepository.findAllByRestaurantId(
                         restaurantId,
                         Sort.by("sortOrder").ascending().and(Sort.by("name").ascending())
                 )
@@ -58,18 +56,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public CategoryDto update(UUID id, CategoryUpdateDto req) {
-        MenuCategory c = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category not found: " + id));
+        MenuCategory c = getCategory(id);
 
         if (req.name() != null) {
             UUID restaurantId = c.getRestaurant().getId();
-            if (categoryRepository.existsByRestaurant_IdAndNameIgnoreCaseAndIdNot(restaurantId, req.name(), id)) {
+            if (categoryRepository.existsByRestaurantIdAndNameIgnoreCaseAndIdNot(restaurantId, req.name(), id)) {
                 throw new ConflictException("Category name already exists for restaurant: " + req.name());
             }
             c.setName(req.name());
         }
 
-        if (req.sortOrder() != null) c.setSortOrder(req.sortOrder());
+        if (req.sortOrder() != null) {
+            c.setSortOrder(req.sortOrder());
+        }
 
         categoryRepository.flush();
 
@@ -79,8 +78,17 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public void delete(UUID id) {
-        MenuCategory c = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category not found: " + id));
+        MenuCategory c = getCategory(id);
         categoryRepository.delete(c);
+    }
+
+    private MenuCategory getCategory(UUID id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found: " + id));
+    }
+
+    private Restaurant getRestaurant(UUID restaurantId) {
+        return restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new NotFoundException("Restaurant not found: " + restaurantId));
     }
 }

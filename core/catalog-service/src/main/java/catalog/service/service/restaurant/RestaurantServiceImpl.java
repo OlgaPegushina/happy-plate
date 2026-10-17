@@ -38,8 +38,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Transactional(readOnly = true)
     @Override
     public RestaurantDto get(UUID id) {
-        Restaurant restaurant = restaurantRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Restaurant not found: " + id));
+        Restaurant restaurant = getRestaurant(id);
 
         return restaurantMapper.toRestaurantDto(restaurant);
     }
@@ -48,7 +47,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public List<RestaurantDto> getAll(Boolean active) {
         Sort sort = Sort.by("name").ascending();
-        List<Restaurant> list = (active == null) ? restaurantRepository.findAll(sort) : restaurantRepository.findAllByActive(active, sort);
+        List<Restaurant> list = (active == null) ? restaurantRepository.findAll(sort) :
+                restaurantRepository.findAllByActive(active, sort);
         return list.stream()
                 .map(restaurantMapper::toRestaurantDto)
                 .toList();
@@ -57,12 +57,17 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Transactional
     @Override
     public RestaurantDto update(UUID id, RestaurantUpdateDto req) {
-        Restaurant restaurant = restaurantRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Restaurant not found: " + id));
+        Restaurant restaurant = getRestaurant(id);
 
-        if (req.description() != null) restaurant.setDescription(req.description());
-        if (req.phone() != null) restaurant.setPhone(req.phone());
-        if (req.address() != null) restaurant.setAddress(req.address());
+        if (req.description() != null) {
+            restaurant.setDescription(req.description());
+        }
+        if (req.phone() != null) {
+            restaurant.setPhone(req.phone());
+        }
+        if (req.address() != null) {
+            restaurant.setAddress(req.address());
+        }
 
         restaurantRepository.flush();
 
@@ -72,13 +77,17 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Transactional
     @Override
     public RestaurantDto updateStatus(UUID id, boolean newStatus) {
-        Restaurant restaurant = restaurantRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Restaurant not found: " + id));
+        Restaurant restaurant = getRestaurant(id);
 
         restaurant.setActive(newStatus);
 
         restaurantRepository.flush();
 
         return restaurantMapper.toRestaurantDto(restaurant);
+    }
+
+    private Restaurant getRestaurant(UUID id) {
+        return restaurantRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Restaurant not found: " + id));
     }
 }

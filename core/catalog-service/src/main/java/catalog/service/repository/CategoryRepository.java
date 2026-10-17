@@ -11,11 +11,11 @@ import java.util.UUID;
 
 public interface CategoryRepository extends JpaRepository<MenuCategory, UUID> {
     @EntityGraph(value = "category-restaurant")
-    List<MenuCategory> findAllByRestaurant_Id(UUID restaurantId, Sort sort);
+    List<MenuCategory> findAllByRestaurantId(UUID restaurantId, Sort sort);
 
-    boolean existsByRestaurant_IdAndNameIgnoreCase(UUID restaurantId, String name);
+    boolean existsByRestaurantIdAndNameIgnoreCase(UUID restaurantId, String name);
 
-    boolean existsByRestaurant_IdAndNameIgnoreCaseAndIdNot(UUID restaurantId, String name, UUID id);
+    boolean existsByRestaurantIdAndNameIgnoreCaseAndIdNot(UUID restaurantId, String name, UUID id);
 
-    Optional<MenuCategory> findByIdAndRestaurant_Id(UUID id, UUID restaurantId);
+    Optional<MenuCategory> findByIdAndRestaurantId(UUID id, UUID restaurantId);
 }

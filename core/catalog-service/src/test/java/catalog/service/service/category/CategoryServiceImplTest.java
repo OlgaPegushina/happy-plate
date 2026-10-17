@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -60,7 +61,7 @@ class CategoryServiceImplTest {
 
         Restaurant r = mock(Restaurant.class);
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(r));
-        when(categoryRepository.existsByRestaurant_IdAndNameIgnoreCase(restaurantId, "Main")).thenReturn(true);
+        when(categoryRepository.existsByRestaurantIdAndNameIgnoreCase(restaurantId, "Main")).thenReturn(true);
 
         assertThatThrownBy(() -> service.create(restaurantId, req))
                 .isInstanceOf(ConflictException.class)
@@ -79,7 +80,7 @@ class CategoryServiceImplTest {
         MenuCategory saved = mock(MenuCategory.class);
 
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(restaurant));
-        when(categoryRepository.existsByRestaurant_IdAndNameIgnoreCase(restaurantId, "Main")).thenReturn(false);
+        when(categoryRepository.existsByRestaurantIdAndNameIgnoreCase(restaurantId, "Main")).thenReturn(false);
         when(categoryRepository.saveAndFlush(any(MenuCategory.class))).thenReturn(saved);
 
         CategoryDto expected = new CategoryDto(UUID.randomUUID(), restaurantId, "Main", 0);
@@ -101,7 +102,7 @@ class CategoryServiceImplTest {
         assertThatThrownBy(() -> service.getAll(restaurantId))
                 .isInstanceOf(NotFoundException.class);
 
-        verify(categoryRepository, never()).findAllByRestaurant_Id(any(), any());
+        verify(categoryRepository, never()).findAllByRestaurantId(any(), any());
     }
 
     @Test
@@ -114,7 +115,7 @@ class CategoryServiceImplTest {
         MenuCategory c1 = mock(MenuCategory.class);
         MenuCategory c2 = mock(MenuCategory.class);
 
-        when(categoryRepository.findAllByRestaurant_Id(eq(restaurantId), any(Sort.class)))
+        when(categoryRepository.findAllByRestaurantId(eq(restaurantId), any(Sort.class)))
                 .thenReturn(List.of(c1, c2));
 
         when(categoryMapper.toCategoryDto(c1))
@@ -127,13 +128,13 @@ class CategoryServiceImplTest {
         assertThat(result).hasSize(2);
 
         ArgumentCaptor<Sort> sortCaptor = ArgumentCaptor.forClass(Sort.class);
-        verify(categoryRepository).findAllByRestaurant_Id(eq(restaurantId), sortCaptor.capture());
+        verify(categoryRepository).findAllByRestaurantId(eq(restaurantId), sortCaptor.capture());
 
         Sort sort = sortCaptor.getValue();
         assertThat(sort.getOrderFor("sortOrder")).isNotNull();
-        assertThat(sort.getOrderFor("sortOrder").getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(Objects.requireNonNull(sort.getOrderFor("sortOrder")).getDirection()).isEqualTo(Sort.Direction.ASC);
         assertThat(sort.getOrderFor("name")).isNotNull();
-        assertThat(sort.getOrderFor("name").getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(Objects.requireNonNull(sort.getOrderFor("name")).getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -159,7 +160,7 @@ class CategoryServiceImplTest {
         when(r.getId()).thenReturn(restaurantId);
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(c));
-        when(categoryRepository.existsByRestaurant_IdAndNameIgnoreCaseAndIdNot(restaurantId, "Main", categoryId))
+        when(categoryRepository.existsByRestaurantIdAndNameIgnoreCaseAndIdNot(restaurantId, "Main", categoryId))
                 .thenReturn(true);
 
         CategoryUpdateDto req = new CategoryUpdateDto("Main", null);
@@ -183,7 +184,7 @@ class CategoryServiceImplTest {
         when(r.getId()).thenReturn(restaurantId);
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(c));
-        when(categoryRepository.existsByRestaurant_IdAndNameIgnoreCaseAndIdNot(restaurantId, "New", categoryId))
+        when(categoryRepository.existsByRestaurantIdAndNameIgnoreCaseAndIdNot(restaurantId, "New", categoryId))
                 .thenReturn(false);
 
         CategoryUpdateDto req = new CategoryUpdateDto("New", 5);

@@ -21,5 +21,5 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
     List<MenuItem> findForRestaurant(UUID restaurantId, Boolean available, UUID categoryId);
 
     @EntityGraph(attributePaths = {"restaurant", "category"})
-    Optional<MenuItem> findByIdAndRestaurant_Id(UUID id, UUID restaurantId);
+    Optional<MenuItem> findByIdAndRestaurantId(UUID id, UUID restaurantId);
 }
