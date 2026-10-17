@@ -1,0 +1,36 @@
+server:
+  port: 8081
+  forward-headers-strategy: framework
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:${POSTGRES_PORT:6541}/${POSTGRES_DB:delivery_db}?currentSchema=catalog
+    username: ${POSTGRES_USER:delivery_user}
+    password: ${POSTGRES_PASSWORD:delivery_pass}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: catalog
+        format_sql: true
+    show-sql: true
+
+  flyway:
+    enabled: true
+    schemas: catalog
+    create-schemas: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # заставляем UI запрашивать спеку по префиксу gateway
+    config-url: /catalog-service/v3/api-docs/swagger-config
+    url: /catalog-service/v3/api-docs
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
