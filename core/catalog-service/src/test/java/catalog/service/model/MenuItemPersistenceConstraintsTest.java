@@ -94,7 +94,12 @@ class MenuItemPersistenceConstraintsTest {
         item.setSortOrder(-1);
 
         assertThatThrownBy(() -> menuItemRepository.saveAndFlush(item))
-                .hasRootCauseInstanceOf(ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class)
+                .satisfies(ex -> {
+                    ConstraintViolationException cve = (ConstraintViolationException) ex;
+                    assertThat(cve.getConstraintViolations())
+                            .anyMatch(v -> v.getPropertyPath().toString().equals("sortOrder"));
+                });
     }
 
     @Test
@@ -102,10 +107,16 @@ class MenuItemPersistenceConstraintsTest {
         MenuItem item = buildValidItem();
         item.setPrice(Money.of(new BigDecimal("-5.00"), "EUR"));
 
-        assertThatThrownBy(() -> assertThatThrownBy(() -> menuItemRepository.saveAndFlush(item))
-                .hasRootCauseInstanceOf(ConstraintViolationException.class)
-                .hasCauseInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("Price amount must be non-negative"));
+        assertThatThrownBy(() -> menuItemRepository.saveAndFlush(item))
+                .isInstanceOf(ConstraintViolationException.class)
+                .satisfies(ex -> {
+                    ConstraintViolationException cve = (ConstraintViolationException) ex;
+                    assertThat(cve.getConstraintViolations())
+                            .anyMatch(v ->
+                                    v.getPropertyPath().toString().equals("price.amount")
+                                    && v.getMessage().contains("Price amount must be non-negative")
+                            );
+                });
     }
 
     @Test
@@ -115,5 +126,36 @@ class MenuItemPersistenceConstraintsTest {
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getName()).isEqualTo("Margarita");
         assertThat(saved.getPrice().getAmount()).isEqualByComparingTo("8.50");
+    }
+
+    @Test
+    void saveNullCurrencyShouldFail() {
+        MenuItem item = buildValidItem();
+        item.setPrice(new Money(new BigDecimal("1.00"), null));
+
+        assertThatThrownBy(() -> menuItemRepository.saveAndFlush(item))
+                .isInstanceOf(ConstraintViolationException.class)
+                .satisfies(ex -> {
+                    ConstraintViolationException cve = (ConstraintViolationException) ex;
+                    assertThat(cve.getConstraintViolations())
+                            .anyMatch(v -> v.getPropertyPath().toString().equals("price.currency"));
+                });
+    }
+
+    @Test
+    void saveInvalidCurrencyShouldFail() {
+        MenuItem item = buildValidItem();
+        item.setPrice(new Money(new BigDecimal("1.00"), "EU"));
+
+        assertThatThrownBy(() -> menuItemRepository.saveAndFlush(item))
+                .isInstanceOf(ConstraintViolationException.class)
+                .satisfies(ex -> {
+                    ConstraintViolationException cve = (ConstraintViolationException) ex;
+                    assertThat(cve.getConstraintViolations())
+                            .anyMatch(v ->
+                                    v.getPropertyPath().toString().equals("price.currency")
+                                    && v.getMessage().contains("Currency must be 3 uppercase letters")
+                            );
+                });
     }
 }

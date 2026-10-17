@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 
 public record MoneyDto(
         @NotNull
-        @DecimalMin("0.00")
+        @DecimalMin(value = "0.00", message = "must be greater than or equal to 0.00")
         @Digits(integer = 8, fraction = 2)
         BigDecimal amount,
 
         @NotBlank
-        @Pattern(regexp = "^[A-Z]{3}$")
+        @Pattern(regexp = "^[A-Z]{3}$", message = "Currency must be 3 uppercase letters")
         String currency
 ) {}

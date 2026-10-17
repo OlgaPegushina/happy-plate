@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @DataJpaTest(properties = {
-        // -- выдёргиваем config-server
+        // -- config-server
         "spring.config.import=",
         "spring.cloud.config.enabled=false",
 

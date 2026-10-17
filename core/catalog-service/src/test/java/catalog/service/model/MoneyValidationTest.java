@@ -31,13 +31,13 @@ class MoneyValidationTest {
     }
 
     @Test
-    void validMoneyDto_shouldPass() {
+    void validMoneyDtoShouldPass() {
         MoneyDto dto = new MoneyDto(new BigDecimal("9.99"), "USD");
         assertThat(validator.validate(dto)).isEmpty();
     }
 
     @Test
-    void negativeAmount_shouldFail() {
+    void negativeAmountShouldFail() {
         MoneyDto dto = new MoneyDto(new BigDecimal("-1.00"), "USD");
 
         Set<ConstraintViolation<MoneyDto>> violations = validator.validate(dto);
@@ -47,12 +47,12 @@ class MoneyValidationTest {
     }
 
     @Test
-    void wrongCurrency_shouldFail() {
+    void wrongCurrencyShouldFail() {
         MoneyDto dto = new MoneyDto(new BigDecimal("10.00"), "usd");
 
         Set<ConstraintViolation<MoneyDto>> violations = validator.validate(dto);
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
-                .contains("^[A-Z]{3}$");
+                .contains("Currency must be 3 uppercase letters");
     }
 }

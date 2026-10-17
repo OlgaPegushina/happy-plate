@@ -23,10 +23,22 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @WebMvcTest(
@@ -49,6 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MenuItemControllerTest {
 
     @Autowired MockMvc mvc;
+
     @Autowired ObjectMapper objectMapper;
 
     @MockitoBean
@@ -205,7 +218,6 @@ class MenuItemControllerTest {
         UUID restaurantId = UUID.randomUUID();
         UUID itemId = UUID.randomUUID();
 
-        // @Size(min=2,max=200) - "A" должно дать 400
         String badJson = """
                 {"name":"A"}
                 """;
@@ -254,7 +266,6 @@ class MenuItemControllerTest {
         UUID restaurantId = UUID.randomUUID();
         UUID itemId = UUID.randomUUID();
 
-        // available=null - @NotNull => 400
         String badJson = "{}";
 
         mvc.perform(patch("/restaurants/{restaurantId}/menu-items/{id}/status", restaurantId, itemId)

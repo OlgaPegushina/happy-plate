@@ -18,10 +18,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @WebMvcTest(
@@ -48,11 +55,9 @@ class ErrorHandlerMvcTest {
     CategoryService service;
 
     @Test
-    void shouldReturn400_whenValidationError() throws Exception {
+    void shouldReturn400WhenValidationError() throws Exception {
         UUID restaurantId = UUID.randomUUID();
 
-        // name: blank - @NotBlank
-        // sortOrder: -1 - @Min(0)
         String badJson = """
                 {
                   "name": "  ",
@@ -72,7 +77,7 @@ class ErrorHandlerMvcTest {
     }
 
     @Test
-    void shouldReturn404_whenNotFoundException() throws Exception {
+    void shouldReturn404WhenNotFoundException() throws Exception {
         UUID restaurantId = UUID.randomUUID();
 
         when(service.getAll(restaurantId))
@@ -87,7 +92,7 @@ class ErrorHandlerMvcTest {
     }
 
     @Test
-    void shouldReturn409_whenConflictException() throws Exception {
+    void shouldReturn409WhenConflictException() throws Exception {
         UUID restaurantId = UUID.randomUUID();
 
         when(service.create(eq(restaurantId), any()))
@@ -111,7 +116,7 @@ class ErrorHandlerMvcTest {
     }
 
     @Test
-    void shouldReturn409_whenDataIntegrityViolation() throws Exception {
+    void shouldReturn409WhenDataIntegrityViolation() throws Exception {
         UUID id = UUID.randomUUID();
 
         doThrow(new DataIntegrityViolationException("FK violation"))
@@ -126,7 +131,7 @@ class ErrorHandlerMvcTest {
     }
 
     @Test
-    void shouldReturn500_whenUnhandledException() throws Exception {
+    void shouldReturn500WhenUnhandledException() throws Exception {
         UUID restaurantId = UUID.randomUUID();
 
         when(service.getAll(restaurantId))

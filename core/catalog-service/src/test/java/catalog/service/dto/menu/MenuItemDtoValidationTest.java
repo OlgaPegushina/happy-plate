@@ -2,6 +2,8 @@ package catalog.service.dto.menu;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -15,11 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MenuItemDtoValidationTest {
 
+    private static ValidatorFactory factory;
     private static Validator validator;
 
     @BeforeAll
-    static void init() {
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
+    static void setUp() {
+        factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        factory.close();
     }
 
     private static Stream<String> invalidNames() {
@@ -28,7 +37,7 @@ class MenuItemDtoValidationTest {
 
     @ParameterizedTest
     @MethodSource("invalidNames")
-    void nameTooShortOrLong_onCreate_shouldFail(String badName) {
+    void nameTooShortOrLongOnCreateShouldFail(String badName) {
         MenuItemCreateDto dto = new MenuItemCreateDto(
                 badName,
                 "desc",
@@ -42,7 +51,7 @@ class MenuItemDtoValidationTest {
 
     @ParameterizedTest
     @MethodSource("invalidNames")
-    void nameTooShortOrLong_onUpdate_shouldFail(String badName) {
+    void nameTooShortOrLongOnUpdateShouldFail(String badName) {
         MenuItemUpdateDto dto = new MenuItemUpdateDto(
                 badName,
                 null,

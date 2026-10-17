@@ -25,9 +25,13 @@ public class Money {
 
     @Column(name = "price_currency", nullable = false, length = 3)
     @Pattern(regexp = "^[A-Z]{3}$", message = "Currency must be 3 uppercase letters")
+    @NotNull
     private String currency;
 
     public static Money of(BigDecimal amount, String currency) {
+        if (currency == null) {
+            throw new IllegalArgumentException("currency must not be null");
+        }
         return new Money(amount, currency.toUpperCase());
     }
 }
