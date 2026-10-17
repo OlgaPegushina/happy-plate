@@ -4,7 +4,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:${POSTGRES_PORT:6541}/${POSTGRES_DB:delivery_db}?currentSchema=catalog
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:6541}/${POSTGRES_DB:delivery_db}?currentSchema=catalog
     username: ${POSTGRES_USER:delivery_user}
     password: ${POSTGRES_PASSWORD:delivery_pass}
   jpa:

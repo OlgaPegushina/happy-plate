@@ -12,7 +12,10 @@ import catalog.service.repository.CategoryRepository;
 import catalog.service.repository.RestaurantRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
@@ -34,11 +37,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
 
-    @Mock RestaurantRepository restaurantRepository;
+    @Mock
+    RestaurantRepository restaurantRepository;
     @Mock CategoryRepository categoryRepository;
     @Mock CategoryMapper categoryMapper;
 
-    @InjectMocks CategoryServiceImpl service;
+    @InjectMocks
+    CategoryServiceImpl service;
 
     @Test
     void createShouldThrowNotFoundWhenRestaurantMissing() {

@@ -10,7 +10,10 @@ import catalog.service.model.Restaurant;
 import catalog.service.repository.RestaurantRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
@@ -32,11 +35,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RestaurantServiceImplTest {
 
-    @Mock RestaurantRepository restaurantRepository;
+    @Mock
+    RestaurantRepository restaurantRepository;
 
     @Mock RestaurantMapper restaurantMapper;
 
-    @InjectMocks RestaurantServiceImpl service;
+    @InjectMocks
+    RestaurantServiceImpl service;
 
     @Test
     void createShouldThrowConflictWhenNameExists() {

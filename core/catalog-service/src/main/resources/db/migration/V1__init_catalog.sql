@@ -14,7 +14,7 @@ CREATE TABLE catalog.restaurants (
   updated_at   timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE UNIQUE INDEX ux_catalog_restaurants_name_ci
+CREATE UNIQUE INDEX IF NOT EXISTS ux_catalog_restaurants_name_ci
   ON catalog.restaurants (lower(name));
 
 -- Menu Categories
@@ -33,15 +33,15 @@ CREATE TABLE catalog.menu_categories (
 );
 
 -- Быстрый поиск по restaurant_id
-CREATE INDEX ix_menu_categories_restaurant_id
+CREATE INDEX IF NOT EXISTS ix_menu_categories_restaurant_id
   ON catalog.menu_categories (restaurant_id);
 
-CREATE INDEX ix_menu_categories_sort
+CREATE INDEX IF NOT EXISTS ix_menu_categories_sort
   ON catalog.menu_categories (restaurant_id, sort_order);
 
 -- Уникальность имени категории ВНУТРИ ресторана без учёта регистра:
 -- (restaurant_id, lower(name))
-CREATE UNIQUE INDEX ux_menu_categories_restaurant_name_ci
+CREATE UNIQUE INDEX IF NOT EXISTS ux_menu_categories_restaurant_name_ci
   ON catalog.menu_categories (restaurant_id, lower(name));
 
 -- Menu Items
@@ -69,21 +69,14 @@ CREATE TABLE catalog.menu_items (
   )
 );
 
-CREATE INDEX ix_menu_items_restaurant_id
+CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_id
   ON catalog.menu_items (restaurant_id);
 
-CREATE INDEX ix_menu_items_restaurant_available
+CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_available
   ON catalog.menu_items (restaurant_id, available);
 
-CREATE INDEX ix_menu_items_category_id
+CREATE INDEX IF NOT EXISTS ix_menu_items_category_id
   ON catalog.menu_items (category_id);
-
--- Дополнительные полезные индексы
-CREATE INDEX ix_menu_items_available_sort
-  ON catalog.menu_items (restaurant_id, available, sort_order);
-
-CREATE INDEX ix_menu_categories_sort
-  ON catalog.menu_categories (restaurant_id, sort_order);
 
 -- Комментарии для документации
 COMMENT ON TABLE catalog.restaurants IS 'Рестораны в системе доставки';

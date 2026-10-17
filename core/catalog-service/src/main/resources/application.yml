@@ -5,7 +5,7 @@ spring:
     import: "optional:configserver:"
   cloud:
     config:
-      fail-fast: true
+      fail-fast: false
       discovery:
         enabled: true
         service-id: config-server
