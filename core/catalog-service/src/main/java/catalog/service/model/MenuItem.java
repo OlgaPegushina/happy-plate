@@ -63,7 +63,7 @@ public class MenuItem {
     @Setter
     @Embedded
     @Valid
-    @NotNull
+    @NotNull(message = "Total must not be null")
     private Money price;
 
     @Setter

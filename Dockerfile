@@ -14,7 +14,7 @@ COPY pom.xml ./pom.xml
 COPY core/pom.xml ./core/pom.xml
 COPY infra/pom.xml ./infra/pom.xml
 
-# 2) POM'ы ВСЕХ модулей (лёгкий слой, нужен чтобы Maven не ругался на <modules>)
+# 2) POM'ы ВСЕХ модулей
 #    Сохраняем пути core/<module>/pom.xml и infra/<module>/pom.xml
 COPY --parents core/*/pom.xml ./
 COPY --parents infra/*/pom.xml ./

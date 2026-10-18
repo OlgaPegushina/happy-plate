@@ -3,6 +3,7 @@ package catalog.service.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
@@ -25,7 +26,7 @@ public class Money {
 
     @Column(name = "price_currency", nullable = false, length = 3)
     @Pattern(regexp = "^[A-Z]{3}$", message = "Currency must be 3 uppercase letters")
-    @NotNull
+    @NotBlank(message = "Currency must not be blank")
     private String currency;
 
     public static Money of(BigDecimal amount, String currency) {

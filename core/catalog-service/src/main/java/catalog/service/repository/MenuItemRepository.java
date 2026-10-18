@@ -22,4 +22,7 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
 
     @EntityGraph(attributePaths = {"restaurant", "category"})
     Optional<MenuItem> findByIdAndRestaurantId(UUID id, UUID restaurantId);
+
+    @EntityGraph(attributePaths = {"restaurant"})
+    List<MenuItem> findByIdIn(List<UUID> ids);
 }
