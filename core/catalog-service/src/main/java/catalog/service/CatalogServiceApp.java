@@ -6,8 +6,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @EnableDiscoveryClient
 @SpringBootApplication
-public class CatalogService {
+public class CatalogServiceApp {
     public static void main(String[] args) {
-        SpringApplication.run(CatalogService.class, args);
+        SpringApplication.run(CatalogServiceApp.class, args);
     }
 }

@@ -1,0 +1,37 @@
+server:
+  port: 8082
+  forward-headers-strategy: framework
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:6541}/${POSTGRES_DB:delivery_db}?currentSchema=order
+    username: ${POSTGRES_USER:delivery_user}
+    password: ${POSTGRES_PASSWORD:delivery_pass}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: order
+        format_sql: true
+    show-sql: true
+
+  flyway:
+    enabled: true
+    default-schema: order
+    schemas: order
+    create-schemas: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # заставляем UI запрашивать спецификацию через Gateway
+    config-url: /order-service/v3/api-docs/swagger-config
+    url: /order-service/v3/api-docs
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
