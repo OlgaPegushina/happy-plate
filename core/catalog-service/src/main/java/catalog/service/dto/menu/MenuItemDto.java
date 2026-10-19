@@ -1,5 +1,7 @@
 package catalog.service.dto.menu;
 
+import interaction.api.dto.MoneyDto;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

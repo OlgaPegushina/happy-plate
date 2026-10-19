@@ -1,6 +1,6 @@
 package order.service.mapper;
 
-import order.service.dto.order.MoneyDto;
+import interaction.api.dto.MoneyDto;
 import order.service.dto.order.OrderDto;
 import order.service.dto.order.OrderItemDto;
 import order.service.model.Money;

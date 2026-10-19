@@ -1,5 +1,6 @@
 package catalog.service.dto.menu;
 
+import interaction.api.dto.MoneyDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;

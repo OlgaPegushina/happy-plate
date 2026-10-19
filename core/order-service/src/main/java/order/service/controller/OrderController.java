@@ -1,10 +1,10 @@
 package order.service.controller;
 
+import interaction.api.dto.OrderStatusUpdateDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import order.service.dto.order.OrderCreateDto;
 import order.service.dto.order.OrderDto;
-import order.service.dto.order.OrderStatusUpdateDto;
 import order.service.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

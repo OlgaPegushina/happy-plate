@@ -1,6 +1,6 @@
 package catalog.service.service.internal;
 
-import catalog.service.dto.internal.MenuItemSnapshotDto;
+import interaction.api.dto.MenuItemSnapshotDto;
 import catalog.service.mapper.internal.MenuItemInternalMapper;
 import catalog.service.model.MenuItem;
 import catalog.service.repository.MenuItemRepository;

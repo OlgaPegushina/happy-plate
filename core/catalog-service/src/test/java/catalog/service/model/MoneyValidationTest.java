@@ -1,6 +1,6 @@
 package catalog.service.model;
 
-import catalog.service.dto.menu.MoneyDto;
+import interaction.api.dto.MoneyDto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

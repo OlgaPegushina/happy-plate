@@ -1,6 +1,6 @@
 package catalog.service.mapper.internal;
 
-import catalog.service.dto.internal.MenuItemSnapshotDto;
+import interaction.api.dto.MenuItemSnapshotDto;
 import catalog.service.model.MenuItem;
 
 public interface MenuItemInternalMapper {

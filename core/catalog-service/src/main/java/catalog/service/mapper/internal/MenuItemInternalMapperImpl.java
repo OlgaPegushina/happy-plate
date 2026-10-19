@@ -1,7 +1,7 @@
 package catalog.service.mapper.internal;
 
-import catalog.service.dto.internal.MenuItemSnapshotDto;
-import catalog.service.dto.menu.MoneyDto;
+import interaction.api.dto.MenuItemSnapshotDto;
+import interaction.api.dto.MoneyDto;
 import catalog.service.model.MenuItem;
 import org.springframework.stereotype.Component;
 

@@ -1,5 +1,6 @@
 package catalog.service.dto.menu;
 
+import interaction.api.dto.MoneyDto;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;

@@ -2,7 +2,7 @@ package order.service.service;
 
 import order.service.dto.order.OrderCreateDto;
 import order.service.dto.order.OrderDto;
-import order.service.enums.OrderStatus;
+import interaction.api.enums.OrderStatus;
 
 import java.util.UUID;
 

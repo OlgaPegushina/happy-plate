@@ -22,12 +22,13 @@ spring:
     schemas: order
     create-schemas: true
 
-  openfeign:
-    client:
-      config:
-        default:
-          connectTimeout: 2000
-          readTimeout: 3000
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 2000
+            readTimeout: 3000
 
 springdoc:
   api-docs:
@@ -42,11 +43,3 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
-
-app:
-  catalog:
-    base-url: http://catalog-service:8081
-  rabbit:
-    orders:
-      exchange: orders.exchange
-      created-routing-key: order.created

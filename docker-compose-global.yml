@@ -36,6 +36,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_running"]
       interval: 10s
@@ -194,13 +196,130 @@ services:
       timeout: 3s
       retries: 30
 
-#  rabbitmq:
-#  zipkin:
-#  postgres:
-#  menu-service:
-# order-service:
+  delivery-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_PATH: core/delivery-service
+    ports:
+      - "8083:8083"
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+      # Rabbit
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+
+      # JWT (если shared yml требует)
+      - JWT_SECRET=super-secret-key-change-in-prod-min-32-chars-long-string
+      - JWT_EXPIRY_MS=3600000
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:8084/actuator/health/readiness" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_PATH: core/payment-service
+    ports:
+      - "8084:8084"
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+      # Rabbit
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+
+      # JWT (если shared yml требует)
+      - JWT_SECRET=super-secret-key-change-in-prod-min-32-chars-long-string
+      - JWT_EXPIRY_MS=3600000
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:8083/actuator/health/readiness" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_PATH: core/notification-service
+    ports:
+      - "8085:8085"
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+      # Rabbit
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+
+      # JWT (если shared yml требует)
+      - JWT_SECRET=super-secret-key-change-in-prod-min-32-chars-long-string
+      - JWT_EXPIRY_MS=3600000
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:8085/actuator/health/readiness" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+
 # courier-service:
-# notification-service:
+
 
 volumes:
   pgdata:
+  rabbitmq_data:

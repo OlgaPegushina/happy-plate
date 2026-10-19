@@ -3,7 +3,7 @@ package catalog.service.service.menu;
 import catalog.service.dto.menu.MenuItemCreateDto;
 import catalog.service.dto.menu.MenuItemDto;
 import catalog.service.dto.menu.MenuItemUpdateDto;
-import catalog.service.dto.menu.MoneyDto;
+import interaction.api.dto.MoneyDto;
 import catalog.service.exception.NotFoundException;
 import catalog.service.mapper.menu.MenuItemMapper;
 import catalog.service.model.MenuCategory;

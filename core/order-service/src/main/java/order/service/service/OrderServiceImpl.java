@@ -1,20 +1,21 @@
 package order.service.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import interaction.api.dto.MenuItemIdsRequest;
+import interaction.api.dto.MenuItemSnapshotDto;
+import interaction.api.event.OrderCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import order.service.dto.order.OrderCreateDto;
 import order.service.dto.order.OrderItemCreateDto;
-import order.service.dto.feign.MenuItemIdsRequest;
-import order.service.dto.feign.MenuItemSnapshotDto;
 import order.service.dto.order.OrderDto;
-import order.service.enums.OrderStatus;
-import order.service.event.OrderCreatedEvent;
+import interaction.api.enums.OrderStatus;
 import order.service.exception.ConflictException;
 import order.service.exception.NotFoundException;
 import order.service.feign.CatalogClient;
@@ -62,21 +63,27 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public OrderDto updateStatus(UUID orderId, OrderStatus status) {
+    public OrderDto updateStatus(UUID orderId, OrderStatus targetStatus) {
         var order = getOrder(orderId);
+        var current = order.getStatus();
 
-        if (status == OrderStatus.CREATED) {
-            return submitIfDraft(order);
+        // -- повтор статуса не ломает обработку
+        if (current == targetStatus) {
+            return orderMapper.toDto(order);
         }
 
-        if (status == OrderStatus.DRAFT) {
-            if (order.getStatus() == OrderStatus.DRAFT) {
-                return orderMapper.toDto(order);
-            }
-            throw new ConflictException("Order status can't be reverted to DRAFT, current=" + order.getStatus());
+        // --Откат в DRAFT запрещаем всегда
+        if (targetStatus == OrderStatus.DRAFT) {
+            throw new ConflictException("Order status can't be reverted to DRAFT, current=" + current);
         }
 
-        throw new ConflictException("Unsupported status change to: " + status);
+        return switch (targetStatus) {
+            case CREATED -> submitIfDraft(order); // DRAFT в CREATED
+            case PAID -> setPaid(order);
+            case DELIVERY_TAKEN -> setDeliveryTaken(order);
+            case DELIVERED -> setDelivered(order);
+            default -> throw new ConflictException("Unsupported target status: " + targetStatus);
+        };
     }
 
     @Transactional(readOnly = true)
@@ -84,6 +91,42 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto getById(UUID orderId) {
         var order = getOrder(orderId);
         return orderMapper.toDto(order);
+    }
+
+    private OrderDto setPaid(Order order) {
+        var current = order.getStatus();
+
+        if (current != OrderStatus.CREATED) {
+            throw new ConflictException("Only CREATED order can be marked as PAID, current=" + current);
+        }
+
+        order.setStatus(OrderStatus.PAID);
+        var saved = orderRepository.saveAndFlush(order);
+        return orderMapper.toDto(saved);
+    }
+
+    private OrderDto setDeliveryTaken(Order order) {
+        var current = order.getStatus();
+
+        if (current != OrderStatus.PAID) {
+            throw new ConflictException("Only PAID order can be marked as DELIVERY_TAKEN, current=" + current);
+        }
+
+        order.setStatus(OrderStatus.DELIVERY_TAKEN);
+        var saved = orderRepository.saveAndFlush(order);
+        return orderMapper.toDto(saved);
+    }
+
+    private OrderDto setDelivered(Order order) {
+        var current = order.getStatus();
+
+        if (current != OrderStatus.DELIVERY_TAKEN) {
+            throw new ConflictException("Only DELIVERY_TAKEN order can be marked as DELIVERED, current=" + current);
+        }
+
+        order.setStatus(OrderStatus.DELIVERED);
+        var saved = orderRepository.saveAndFlush(order);
+        return orderMapper.toDto(saved);
     }
 
     private Order getOrder(UUID orderId) {
@@ -95,11 +138,9 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() == OrderStatus.CREATED) {
             return orderMapper.toDto(order);
         }
-
         if (order.getStatus() != OrderStatus.DRAFT) {
             throw new ConflictException("Only DRAFT order can be submitted, current=" + order.getStatus());
         }
-
         var ids = order.getItems().stream()
                 .map(OrderItem::getMenuItemId)
                 .distinct()
@@ -108,12 +149,14 @@ public class OrderServiceImpl implements OrderService {
         var catalogItems = fetchCatalogItems(ids);
         validateAvailability(catalogItems);
         validateRestaurant(order.getRestaurantId(), catalogItems);
-
         order.setStatus(OrderStatus.CREATED);
-
         var saved = orderRepository.saveAndFlush(order);
-        eventPublisher.publishEvent(new OrderCreatedEvent(saved.getId()));
-
+        eventPublisher.publishEvent(new OrderCreatedEvent(
+                UUID.randomUUID(),
+                Instant.now(),
+                1,
+                saved.getId()
+        ));
         return orderMapper.toDto(saved);
     }
 

@@ -4,7 +4,7 @@ import catalog.service.dto.menu.MenuItemCreateDto;
 import catalog.service.dto.menu.MenuItemDto;
 import catalog.service.dto.menu.MenuItemStatusUpdateDto;
 import catalog.service.dto.menu.MenuItemUpdateDto;
-import catalog.service.dto.menu.MoneyDto;
+import interaction.api.dto.MoneyDto;
 import catalog.service.service.menu.MenuItemService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
