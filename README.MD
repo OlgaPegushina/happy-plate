@@ -204,3 +204,27 @@ public final class AppConstants {
 
 ```bash
 docker compose up -d --build
+```
+
+## Docker build (единый Dockerfile для всех сервисов)
+
+В проекте используется **один общий `Dockerfile` в корне репозитория**.  
+Какой именно сервис (модуль Maven) собирать — задаётся аргументом сборки `MODULE_PATH`.
+
+### Зачем так сделано
+- Единый стандарт сборки для всех сервисов (одинаковый JDK/JRE, параметры JVM, TZ).
+- Уменьшение дублирования: не нужно поддерживать `Dockerfile` в каждом модуле.
+- Быстрее пересборки за счёт кеширования слоёв:
+  - сначала копируются только `pom.xml`,
+  - выполняется прогрев зависимостей `dependency:go-offline`,
+  - исходники копируются только после этого.
+- Каждый сервис в docker-compose.yml использует один и тот же контекст и Dockerfile, но передаёт свой MODULE_PATH
+
+---
+## 9) Полезные ссылки (локально)
+
+- Gateway: http://localhost:8080
+- Eureka: http://localhost:8761
+- Config Server: http://localhost:8888
+- Zipkin: http://localhost:9411
+- RabbitMQ Management: http://localhost:15672 (guest/guest)
