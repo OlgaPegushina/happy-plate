@@ -18,9 +18,11 @@ spring:
 
   flyway:
     enabled: true
-    default-schema: order
-    schemas: order
-    create-schemas: true
+    locations: classpath:db/migration
+    schemas: orders
+    default-schema: orders
+    create-schemas: false
+    table: flyway_schema_history_orders
 
   cloud:
     openfeign:

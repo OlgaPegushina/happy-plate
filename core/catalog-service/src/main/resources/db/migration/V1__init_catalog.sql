@@ -39,7 +39,7 @@ CREATE INDEX IF NOT EXISTS ix_menu_categories_restaurant_id
 CREATE INDEX IF NOT EXISTS ix_menu_categories_sort
   ON catalog.menu_categories (restaurant_id, sort_order);
 
--- Уникальность имени категории ВНУТРИ ресторана без учёта регистра:
+-- Уникальность имени категории внутри ресторана без учёта регистра:
 -- (restaurant_id, lower(name))
 CREATE UNIQUE INDEX IF NOT EXISTS ux_menu_categories_restaurant_name_ci
   ON catalog.menu_categories (restaurant_id, lower(name));

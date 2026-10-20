@@ -32,7 +32,6 @@ public class MenuItemInternalServiceImpl implements MenuItemInternalService {
         Map<UUID, MenuItemSnapshotDto> byId = found.stream()
                 .collect(Collectors.toMap(MenuItem::getId, menuItemInternalMapper::toSnapshot));
 
-        // -- возвращаем в порядке запроса
         List<MenuItemSnapshotDto> result = new ArrayList<>(uniqueIds.size());
         for (UUID id : uniqueIds) {
             MenuItemSnapshotDto dto = byId.get(id);

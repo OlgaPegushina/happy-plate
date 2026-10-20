@@ -18,8 +18,11 @@ spring:
 
   flyway:
     enabled: true
+    locations: classpath:db/migration
     schemas: catalog
-    create-schemas: true
+    default-schema: catalog
+    create-schemas: false
+    table: flyway_schema_history_catalog
 
 springdoc:
   api-docs:

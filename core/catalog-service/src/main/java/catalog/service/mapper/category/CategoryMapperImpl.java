@@ -13,7 +13,9 @@ public class CategoryMapperImpl implements CategoryMapper {
                 menuCategory.getId(),
                 menuCategory.getRestaurant().getId(),
                 menuCategory.getName(),
-                menuCategory.getSortOrder()
+                menuCategory.getSortOrder(),
+                menuCategory.getCreatedAt(),
+                menuCategory.getUpdatedAt()
         );
     }
 }

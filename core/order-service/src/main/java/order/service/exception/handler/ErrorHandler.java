@@ -10,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.util.stream.Collectors;
 
@@ -42,7 +44,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleConflict(ConflictException ex) {
+    public ApiError handleBusinessConflict(ConflictException ex) {
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
                 .reason("Конфликт данных")
@@ -52,11 +54,31 @@ public class ErrorHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleConflict(DataIntegrityViolationException ex) {
+    public ApiError handleConstraintConflict(DataIntegrityViolationException ex) {
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
                 .reason("Конфликт ограничений")
                 .message(ex.getMessage())
+                .build();
+    }
+
+
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleNotReadable(HttpMessageNotReadableException ex) {
+        Throwable root = ex.getMostSpecificCause();
+
+        String message = root != null ? root.getMessage() : ex.getMessage();
+
+        if (root instanceof InvalidFormatException ife) {
+            message = "Invalid value: " + ife.getValue();
+        }
+
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Ошибка валидации")
+                .message(message)
                 .build();
     }
 

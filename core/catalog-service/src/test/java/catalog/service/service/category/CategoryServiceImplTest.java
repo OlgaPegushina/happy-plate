@@ -88,7 +88,8 @@ class CategoryServiceImplTest {
         when(categoryRepository.existsByRestaurantIdAndNameIgnoreCase(restaurantId, "Main")).thenReturn(false);
         when(categoryRepository.saveAndFlush(any(MenuCategory.class))).thenReturn(saved);
 
-        CategoryDto expected = new CategoryDto(UUID.randomUUID(), restaurantId, "Main", 0);
+        CategoryDto expected = new CategoryDto(UUID.randomUUID(), restaurantId,
+                "Main", 0, null, null);
         when(categoryMapper.toCategoryDto(saved)).thenReturn(expected);
 
         CategoryDto actual = service.create(restaurantId, req);
@@ -124,9 +125,9 @@ class CategoryServiceImplTest {
                 .thenReturn(List.of(c1, c2));
 
         when(categoryMapper.toCategoryDto(c1))
-                .thenReturn(new CategoryDto(UUID.randomUUID(), restaurantId, "A", 0));
+                .thenReturn(new CategoryDto(UUID.randomUUID(), restaurantId, "A", 0, null, null));
         when(categoryMapper.toCategoryDto(c2))
-                .thenReturn(new CategoryDto(UUID.randomUUID(), restaurantId, "B", 1));
+                .thenReturn(new CategoryDto(UUID.randomUUID(), restaurantId, "B", 1, null, null));
 
         List<CategoryDto> result = service.getAll(restaurantId);
 
@@ -194,7 +195,7 @@ class CategoryServiceImplTest {
 
         CategoryUpdateDto req = new CategoryUpdateDto("New", 5);
 
-        CategoryDto expected = new CategoryDto(categoryId, restaurantId, "New", 5);
+        CategoryDto expected = new CategoryDto(categoryId, restaurantId, "New", 5, null, null);
         when(categoryMapper.toCategoryDto(c)).thenReturn(expected);
 
         CategoryDto actual = service.update(categoryId, req);

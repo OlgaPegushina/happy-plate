@@ -42,7 +42,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleConflict(ConflictException ex) {
+    public ApiError handleBusinessConflict(ConflictException ex) {
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
                 .reason("Конфликт данных")
@@ -52,7 +52,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleConflict(DataIntegrityViolationException ex) {
+    public ApiError handleConstraintConflict(DataIntegrityViolationException ex) {
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
                 .reason("Конфликт ограничений")

@@ -56,9 +56,7 @@ public class OrderServiceImpl implements OrderService {
 
         var order = buildDraftOrder(req, normalized, byId, currency);
 
-        var saved = orderRepository.saveAndFlush(order);
-
-        return orderMapper.toDto(saved);
+        return orderMapper.toDto(orderRepository.save(order));
     }
 
     @Transactional
@@ -101,8 +99,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(OrderStatus.PAID);
-        var saved = orderRepository.saveAndFlush(order);
-        return orderMapper.toDto(saved);
+
+        return orderMapper.toDto(order);
     }
 
     private OrderDto setDeliveryTaken(Order order) {
@@ -113,8 +111,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(OrderStatus.DELIVERY_TAKEN);
-        var saved = orderRepository.saveAndFlush(order);
-        return orderMapper.toDto(saved);
+
+        return orderMapper.toDto(order);
     }
 
     private OrderDto setDelivered(Order order) {
@@ -125,8 +123,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(OrderStatus.DELIVERED);
-        var saved = orderRepository.saveAndFlush(order);
-        return orderMapper.toDto(saved);
+
+        return orderMapper.toDto(order);
     }
 
     private Order getOrder(UUID orderId) {
@@ -150,14 +148,14 @@ public class OrderServiceImpl implements OrderService {
         validateAvailability(catalogItems);
         validateRestaurant(order.getRestaurantId(), catalogItems);
         order.setStatus(OrderStatus.CREATED);
-        var saved = orderRepository.saveAndFlush(order);
+
         eventPublisher.publishEvent(new OrderCreatedEvent(
                 UUID.randomUUID(),
                 Instant.now(),
                 1,
-                saved.getId()
+                order.getId()
         ));
-        return orderMapper.toDto(saved);
+        return orderMapper.toDto(order);
     }
 
     private Map<UUID, Integer> normalizeItems(List<OrderItemCreateDto> items) {
