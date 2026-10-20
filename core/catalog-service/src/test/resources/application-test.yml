@@ -1,0 +1,35 @@
+spring:
+  config:
+    import: ""              # затираем even optional:configserver:
+
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+      fail-fast: false
+    discovery:
+      enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:catalog;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=create schema if not exists catalog\;set schema catalog
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate.format_sql: true
+      hibernate.default_schema: catalog
+  flyway.enabled: false     # схемы создаём автоматически, миграции нам в unit-тестах не нужны
+
+eureka:
+  client:
+    enabled: false
+
+logging.level:
+  org.springframework.cloud: WARN
+  com.netflix: OFF
