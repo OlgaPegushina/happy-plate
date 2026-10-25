@@ -8,12 +8,11 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static interaction.api.utility.AppConstants.Q_PAYMENT_ORDER_CREATED;
 import static interaction.api.utility.AppConstants.RK_ORDER_CREATED;
 
 @Configuration
 public class PaymentAmqpConfig {
-
-    public static final String Q_PAYMENT_ORDER_CREATED = "payment.order-created.q";
 
     @Bean
     public Queue paymentOrderCreatedQueue() {

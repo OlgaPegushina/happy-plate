@@ -22,3 +22,7 @@ target/
 *.iws
 *.iml
 *.ipr
+
+# JWT keys / local secrets
+secrets/
+*.pem

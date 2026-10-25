@@ -5,6 +5,7 @@ import order.service.exception.ConflictException;
 import order.service.exception.NotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,14 +63,12 @@ public class ErrorHandler {
                 .build();
     }
 
-
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleNotReadable(HttpMessageNotReadableException ex) {
         Throwable root = ex.getMostSpecificCause();
 
-        String message = root != null ? root.getMessage() : ex.getMessage();
+        String message = root.getMessage();
 
         if (root instanceof InvalidFormatException ife) {
             message = "Invalid value: " + ife.getValue();
@@ -79,6 +78,36 @@ public class ErrorHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .reason("Ошибка валидации")
                 .message(message)
+                .build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleAccessDenied(AccessDeniedException ex) {
+        return ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .reason("Доступ запрещён")
+                .message(ex.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleIllegalState(IllegalStateException ex) {
+        return ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .reason("Некорректная авторизация")
+                .message(ex.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleIllegalArgument(IllegalArgumentException ex) {
+        return ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .reason("Некорректная авторизация")
+                .message(ex.getMessage())
                 .build();
     }
 

@@ -24,6 +24,12 @@ spring:
     create-schemas: false
     table: flyway_schema_history_catalog
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth-service:9000/.well-known/jwks.json
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -35,5 +41,8 @@ springdoc:
 
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: info
+
+internal:
+  token: ${INTERNAL_TOKEN:dev-internal-secret}

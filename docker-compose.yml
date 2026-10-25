@@ -39,10 +39,11 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
-      interval: 10s
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 30
+      start_period: 60s
 
   # --- Database (PostgreSQL) ---
   postgres:
@@ -74,7 +75,7 @@ services:
     ports:
       - "8888:8888"
     environment:
-      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -93,7 +94,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
     depends_on:
       config-server:
@@ -111,7 +112,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
 
       # DB
@@ -127,9 +128,9 @@ services:
       - RABBITMQ_USER=app
       - RABBITMQ_PASSWORD=app_pass
 
-      # JWT
-      - JWT_SECRET=super-secret-key-change-in-prod-min-32-chars-long-string
-      - JWT_EXPIRY_MS=3600000
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://auth-service:9000/.well-known/jwks.json
+
+      - INTERNAL_TOKEN=${INTERNAL_TOKEN:-dev-internal-secret}
 
     depends_on:
       discovery-server:
@@ -141,6 +142,8 @@ services:
       rabbitmq:
         condition: service_healthy
       zipkin:
+        condition: service_healthy
+      auth-service:
         condition: service_healthy
 
     restart: unless-stopped
@@ -160,7 +163,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
 
       # DB
@@ -176,6 +179,10 @@ services:
       - RABBITMQ_USER=app
       - RABBITMQ_PASSWORD=app_pass
 
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://auth-service:9000/.well-known/jwks.json
+
+      - INTERNAL_TOKEN=${INTERNAL_TOKEN:-dev-internal-secret}
+
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -187,6 +194,8 @@ services:
         condition: service_healthy
       zipkin:
         condition: service_healthy
+      auth-service:
+        condition: service_healthy
 
     restart: unless-stopped
 
@@ -195,6 +204,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
+      start_period: 20s
 
   delivery-service:
     build:
@@ -205,7 +215,7 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
 
       # Rabbit
@@ -214,9 +224,9 @@ services:
       - RABBITMQ_USER=app
       - RABBITMQ_PASSWORD=app_pass
 
-      # JWT (если shared yml требует)
-      - JWT_SECRET=super-secret-key-change-in-prod-min-32-chars-long-string
-      - JWT_EXPIRY_MS=3600000
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://auth-service:9000/.well-known/jwks.json
+
+      - INTERNAL_TOKEN=${INTERNAL_TOKEN:-dev-internal-secret}
 
     depends_on:
       discovery-server:
@@ -226,6 +236,10 @@ services:
       rabbitmq:
         condition: service_healthy
       zipkin:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      order-service:
         condition: service_healthy
 
     restart: unless-stopped
@@ -245,7 +259,7 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
 
       # Rabbit
@@ -254,9 +268,9 @@ services:
       - RABBITMQ_USER=app
       - RABBITMQ_PASSWORD=app_pass
 
-      # JWT (если shared yml требует)
-      - JWT_SECRET=super-secret-key-change-in-prod-min-32-chars-long-string
-      - JWT_EXPIRY_MS=3600000
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://auth-service:9000/.well-known/jwks.json
+
+      - INTERNAL_TOKEN=${INTERNAL_TOKEN:-dev-internal-secret}
 
     depends_on:
       discovery-server:
@@ -266,6 +280,10 @@ services:
       rabbitmq:
         condition: service_healthy
       zipkin:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      order-service:
         condition: service_healthy
 
     restart: unless-stopped
@@ -285,7 +303,7 @@ services:
     ports:
       - "8085:8085"
     environment:
-      - EUREKA_DEFAULT_ZONE=http://discovery-server:8761/eureka/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
       - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
 
       # Rabbit
@@ -293,10 +311,6 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=app
       - RABBITMQ_PASSWORD=app_pass
-
-      # JWT (если shared yml требует)
-      - JWT_SECRET=super-secret-key-change-in-prod-min-32-chars-long-string
-      - JWT_EXPIRY_MS=3600000
 
     depends_on:
       discovery-server:
@@ -315,6 +329,55 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_PATH: core/auth-service
+    ports:
+      - "9000:9000"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+      # DB
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=delivery_db
+      - POSTGRES_USER=delivery_user
+      - POSTGRES_PASSWORD=delivery_pass
+
+      # JWT keys (подхватываются из application.yml через ${...})
+      - JWT_PRIVATE_KEY=file:/run/secrets/jwt-private.pem
+      - JWT_PUBLIC_KEY=file:/run/secrets/jwt-public.pem
+
+      - APP_ADMIN_EMAIL=admin@mail.ru
+      - APP_ADMIN_PASSWORD=admin12345
+
+    volumes:
+      - ./secrets/jwt-private.pem:/run/secrets/jwt-private.pem:ro
+      - ./secrets/jwt-public.pem:/run/secrets/jwt-public.pem:ro
+
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:9000/actuator/health/readiness" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 100s
 
 
 # courier-service:

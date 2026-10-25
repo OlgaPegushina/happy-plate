@@ -8,10 +8,10 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static interaction.api.utility.AppConstants.Q_NOTIFICATIONS;
+
 @Configuration
 public class NotificationAmqpConfig {
-
-    public static final String Q_NOTIFICATIONS = "notification.events.q";
 
     @Bean
     public Queue notificationQueue() {

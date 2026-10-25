@@ -5,5 +5,5 @@ public enum OrderStatus {
     CREATED,
     PAID,
     DELIVERY_TAKEN,
-    DELIVERED,
+    DELIVERED
 }

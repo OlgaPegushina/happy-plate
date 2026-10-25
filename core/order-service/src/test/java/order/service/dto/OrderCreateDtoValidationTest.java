@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderCreateDtoValidationTest {
 
     private static ValidatorFactory factory;
+
     private static Validator validator;
 
     @BeforeAll
@@ -31,20 +32,8 @@ class OrderCreateDtoValidationTest {
     }
 
     @Test
-    void nullCustomerIdShouldFail() {
-        var dto = new OrderCreateDto(
-                null,
-                UUID.randomUUID(),
-                List.of(new OrderItemCreateDto(UUID.randomUUID(), 1))
-        );
-
-        assertThat(validator.validate(dto)).isNotEmpty();
-    }
-
-    @Test
     void nullRestaurantIdShouldFail() {
         var dto = new OrderCreateDto(
-                UUID.randomUUID(),
                 null,
                 List.of(new OrderItemCreateDto(UUID.randomUUID(), 1))
         );
@@ -56,7 +45,6 @@ class OrderCreateDtoValidationTest {
     void nullItemsShouldFail() {
         var dto = new OrderCreateDto(
                 UUID.randomUUID(),
-                UUID.randomUUID(),
                 null
         );
 
@@ -66,7 +54,6 @@ class OrderCreateDtoValidationTest {
     @Test
     void emptyItemsShouldFail() {
         var dto = new OrderCreateDto(
-                UUID.randomUUID(),
                 UUID.randomUUID(),
                 List.of()
         );
@@ -78,7 +65,6 @@ class OrderCreateDtoValidationTest {
     void invalidItemInsideItemsShouldFail() {
         var dto = new OrderCreateDto(
                 UUID.randomUUID(),
-                UUID.randomUUID(),
                 List.of(new OrderItemCreateDto(null, 0)) // @NotNull + @Positive
         );
 
@@ -88,7 +74,6 @@ class OrderCreateDtoValidationTest {
     @Test
     void validCreateShouldPass() {
         var dto = new OrderCreateDto(
-                UUID.randomUUID(),
                 UUID.randomUUID(),
                 List.of(new OrderItemCreateDto(UUID.randomUUID(), 2))
         );

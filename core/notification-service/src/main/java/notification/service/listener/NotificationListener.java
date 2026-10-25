@@ -5,16 +5,17 @@ import interaction.api.event.DeliveryTakenEvent;
 import interaction.api.event.OrderCreatedEvent;
 import interaction.api.event.PaymentPaidEvent;
 import lombok.extern.slf4j.Slf4j;
-import notification.service.config.NotificationAmqpConfig;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
+import static interaction.api.utility.AppConstants.Q_NOTIFICATIONS;
+
 @Slf4j
 @Component
-@RabbitListener(queues = NotificationAmqpConfig.Q_NOTIFICATIONS)
+@RabbitListener(queues = Q_NOTIFICATIONS)
 public class NotificationListener {
 
     @RabbitHandler

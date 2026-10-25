@@ -1,6 +1,7 @@
 package order.service.mapper;
 
 import interaction.api.dto.MoneyDto;
+import order.service.dto.order.OrderAdminDto;
 import order.service.dto.order.OrderDto;
 import order.service.dto.order.OrderItemDto;
 import order.service.model.Money;
@@ -20,6 +21,16 @@ public class OrderMapperImpl implements OrderMapper {
                 order.getStatus().name(),
                 toMoneyDto(order.getTotal()),
                 order.getItems().stream().map(this::toItemDto).toList()
+        );
+    }
+
+    @Override
+    public OrderAdminDto toDtosForAdmin(Order order) {
+        return new OrderAdminDto(
+                order.getId(),
+                order.getStatus(),
+                toMoneyDto(order.getTotal()),
+                order.getCreatedAt()
         );
     }
 

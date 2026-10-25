@@ -8,9 +8,11 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import interaction.api.enums.OrderStatus;
@@ -31,7 +33,9 @@ import java.util.UUID;
 @Setter
 public class Order {
     @Id
+    @GeneratedValue
     @UuidGenerator
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Column(name = "customer_id", nullable = false)

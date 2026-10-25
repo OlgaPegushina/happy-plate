@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderItemCreateDtoValidationTest {
 
     private static ValidatorFactory factory;
+
     private static Validator validator;
 
     @BeforeAll

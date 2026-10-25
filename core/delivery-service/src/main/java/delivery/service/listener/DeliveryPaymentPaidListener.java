@@ -1,6 +1,5 @@
 package delivery.service.listener;
 
-import delivery.service.config.DeliveryAmqpConfig;
 import delivery.service.publisher.DeliveryEventsPublisher;
 import delivery.service.service.OrderStatusService;
 import interaction.api.event.PaymentPaidEvent;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import static interaction.api.utility.AppConstants.Q_DELIVERY_PAYMENT_PAID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class DeliveryPaymentPaidListener {
 
     private final DeliveryEventsPublisher publisher;
 
-    @RabbitListener(queues = DeliveryAmqpConfig.Q_DELIVERY_PAYMENT_PAID)
+    @RabbitListener(queues = Q_DELIVERY_PAYMENT_PAID)
     public void onPaymentPaid(PaymentPaidEvent event) {
         log.info("Got PaymentPaidEvent: orderId={}", event.orderId());
 
@@ -37,7 +38,7 @@ public class DeliveryPaymentPaidListener {
 
     private void sleepImitatingDelivery() {
         try {
-            Thread.sleep(2000 + ThreadLocalRandom.current().nextInt(3000));
+            Thread.sleep(1000 + ThreadLocalRandom.current().nextInt(500));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

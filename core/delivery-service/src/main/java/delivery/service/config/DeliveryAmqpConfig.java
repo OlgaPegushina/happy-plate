@@ -8,12 +8,11 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static interaction.api.utility.AppConstants.Q_DELIVERY_PAYMENT_PAID;
 import static interaction.api.utility.AppConstants.RK_PAYMENT_PAID;
 
 @Configuration
 public class DeliveryAmqpConfig {
-
-    public static final String Q_DELIVERY_PAYMENT_PAID = "delivery.payment-paid.q";
 
     @Bean
     public Queue deliveryPaymentPaidQueue() {

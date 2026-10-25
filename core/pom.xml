@@ -19,6 +19,7 @@
         <module>delivery-service</module>
         <module>interaction-api</module>
         <module>notification-service</module>
+        <module>auth-service</module>
     </modules>
 
     <dependencyManagement>
