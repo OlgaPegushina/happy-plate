@@ -1,4 +1,4 @@
-# HappyPlate — микросервисная платформа доставки еды
+# HappyPlate — микросервисная платформа доставки еды из ресторанов
 (Java 21 и Spring Boot 3.5.x.)
 
 Фокус проекта:
@@ -6,7 +6,7 @@
 - синхронные вызовы между сервисами через OpenFeign
 - асинхронное взаимодействие через RabbitMQ (доменные события)
 - безопасность (Auth Service + JWT)
-- наблюдаемость (Actuator + Zipkin tracing)
+- наблюдаемость (Actuator)
 - запуск целиком через Docker Compose
 
 ---
@@ -26,7 +26,6 @@
 | `notification-service`      |  8085 | Заглушка уведомлений (stateless), реакция на события          |
 | `discovery-server` (Eureka) |  8761 | Реестр сервисов                                               |
 | `config-server`             |  8888 | Централизованные конфиги (native)                             |
-| `zipkin`                    |  9411 | Distributed tracing                                           |
 | `rabbitmq` (AMQP)           |  5672 | Брокер сообщений                                              |
 | `rabbitmq` (UI)             | 15672 | RabbitMQ Management                                           |
 | `postgres`                  |  5432 | База данных dev-окружения                                     |
@@ -44,8 +43,6 @@
 - `gateway-server` (Spring Cloud Gateway)
   - единая точка входа, маршрутизация, проксирование Swagger-спецификаций
   - работает как OAuth2 Resource Server (валидация JWT по JWKS)
-- `zipkin`
-  - сбор распределённых трасс
 - `rabbitmq`
   - транспорт доменных событий
 - `postgres`
@@ -230,10 +227,6 @@ public final class AppConstants {
 6) `notification-service` потребляет доменные события
    - эмулирует уведомления (логирование)
 
-### Сценарий D — Наблюдаемость
-- Запросы через Gateway трассируются
-- В Zipkin можно увидеть цепочки вызовов (например: `gateway` -> `order-service` -> `catalog-service`) и дальнейшую обработку
-
 ---
 
 ## 6) Нефункциональные требования (реализовано)
@@ -244,9 +237,6 @@ public final class AppConstants {
   - `/actuator/health/liveness`
   - `/actuator/health/readiness`
   - `/actuator/info`
-- Distributed tracing:
-  - Micrometer Tracing
-  - экспорт трасс в Zipkin
 
 ### Отказоустойчивость на уровне запуска окружения
 - Docker Compose поднимает инфраструктуру и сервисы как единый стенд
@@ -286,7 +276,6 @@ public final class AppConstants {
 - Docker / Docker Compose
 - PostgreSQL (схемы: `identity`, `catalog`, `orders`)
 - RabbitMQ (+ Management UI)
-- Zipkin
 
 ---
 
@@ -294,7 +283,7 @@ public final class AppConstants {
 
 ### Предварительные требования
 - Установлен Docker Desktop (с Docker Compose v2)
-- Свободны порты: `8080`, `8761`, `8888`, `9000`, `9411`, `5672`, `15672`, и порт Postgres
+- Свободны порты: `8080`, `8761`, `8888`, `9000`, `5672`, `15672`, и порт Postgres
 - (для варианта A генерации ключей) установлен JDK 21 / IntelliJ IDEA
 
 ## - Генерация JWT ключей (auth-service)
@@ -380,7 +369,6 @@ docker compose down -v
 | Auth JWKS | http://localhost:9000/.well-known/jwks.json |
 | Eureka Dashboard | http://localhost:8761 |
 | Config Server | http://localhost:8888 |
-| Zipkin | http://localhost:9411 |
 | RabbitMQ Management | http://localhost:15672 |
 | Swagger (через Gateway) | http://localhost:8080/swagger-ui.html |
 
