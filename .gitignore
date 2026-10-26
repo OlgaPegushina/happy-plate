@@ -26,3 +26,5 @@ target/
 # JWT keys / local secrets
 secrets/
 *.pem
+
+*.pptx
