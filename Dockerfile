@@ -22,14 +22,14 @@ COPY --parents infra/*/pom.xml ./
 # 3) Кэш зависимостей
 RUN mvn -B -pl ${MODULE_PATH} -am dependency:go-offline
 
-# 4) Теперь копируем исходники
+# 4) Исходники
 COPY core ./core
 COPY infra ./infra
 
 # 5) Сборка
 RUN mvn -B -pl ${MODULE_PATH} -am clean package -DskipTests
 
-# 6) Забираем один исполняемый jar
+# 6) Исполняемый jar
 RUN set -eux; \
     JAR="$(ls -1 ${MODULE_PATH}/target/*.jar | grep -v '\.original$' | head -n 1)"; \
     cp "$JAR" /workspace/app.jar
