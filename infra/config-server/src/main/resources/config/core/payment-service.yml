@@ -1,0 +1,40 @@
+server:
+  port: 8084
+
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 5000
+            readTimeout: 30000
+      okhttp:
+        enabled: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth-service:9000/.well-known/jwks.json
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: info
+    payment.service.feign.OrderStatusClient: DEBUG
+
+internal:
+  token: ${INTERNAL_TOKEN:dev-internal-secret}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+      group:
+        readiness:
+          include:
+            - readinessState
+            - rabbit

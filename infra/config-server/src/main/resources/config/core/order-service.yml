@@ -1,0 +1,77 @@
+server:
+  port: 8082
+  forward-headers-strategy: framework
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:6541}/${POSTGRES_DB:delivery_db}?currentSchema=orders
+    username: ${POSTGRES_USER:delivery_user}
+    password: ${POSTGRES_PASSWORD:delivery_pass}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: orders
+        format_sql: true
+    show-sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: orders
+    default-schema: orders
+    create-schemas: false
+    table: flyway_schema_history_orders
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth-service:9000/.well-known/jwks.json
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          catalog-service:
+            connectTimeout: 5000
+            readTimeout: 30000
+            loggerLevel: full
+          default:
+            connectTimeout: 5000
+            readTimeout: 30000
+            loggerLevel: full
+      okhttp:
+        enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # заставляем UI запрашивать спецификацию через Gateway
+    config-url: /order-service/v3/api-docs/swagger-config
+    url: /order-service/v3/api-docs
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: info
+    order.service.feign.CatalogClient: DEBUG
+    feign: DEBUG
+
+internal:
+  token: ${INTERNAL_TOKEN:dev-internal-secret}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+      group:
+        readiness:
+          include:
+            - readinessState
+            - rabbit
